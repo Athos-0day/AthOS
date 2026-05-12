@@ -13,6 +13,7 @@
 #include <n7OS/cpu.h>
 #include <n7OS/irq.h>
 #include <n7OS/keyboard.h>
+#include <n7OS/process.h>
 #include <n7OS/time.h>
 #include <stdio.h>
 
@@ -95,7 +96,7 @@ void handler_it33() {
 
   // test pour debug
   if ((c != "\0") && (code_key < 0x80)) {
-    printf("[Interruption clavier] %c\n", c);
+    console_putchar(c);
   }
   // Acquittement de l'IT au PIC
   outb(0x20, 0x20);

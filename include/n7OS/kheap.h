@@ -13,6 +13,11 @@
 void init_kheap();
 
 /**
+ * @brief Récupère l'adresse de placement actuelle du tas du noyau.
+ */
+uint32_t get_kheap_placement_address();
+
+/**
  * @brief Alloue une zone mémoire de taille sz. C'est une version simplifiée de
  * kmalloc().
  *

@@ -119,8 +119,10 @@ void console_putchar(const char c) {
   else if (c == '\b') {
     // Check if there is something to erase on the current row
     if (column > 0u) {
-      scr_tab[current_pos - 1u] = CHAR_COLOR << 8 | ' ';
-      column--;
+      if (row > 3 || (row == 3 && column > 0)) {
+        scr_tab[current_pos - 1u] = CHAR_COLOR << 8 | ' ';
+        column--;
+      }
     }
     // Otherwise we move up to the upper row
     else if (row > 0u) {
