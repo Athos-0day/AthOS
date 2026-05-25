@@ -1,6 +1,7 @@
 #include <../include/debug.h>
 #include <n7OS/console.h>
 #include <n7OS/cpu.h>
+#include <unistd.h>
 
 /* Variable to stock the screen adress */
 uint16_t *scr_tab;
@@ -199,11 +200,28 @@ void print_heure(heure_t heure) {
   // Calcul de la colonne de départ (80 - 16 = 64)
   uint8_t start_col = VGA_WIDTH - 16;
 
-  uint8_t old_row = row;
-  uint8_t old_col = column;
-
   for (uint8_t i = 0; i < 16; i++) {
     uint16_t pos = (0 * VGA_WIDTH) + (start_col + i);
     scr_tab[pos] = (uint16_t)(CHAR_COLOR << 8) | time_buf[i];
+  }
+}
+
+void print_process1_message(uint8_t color_index) {
+  const char *message = "Hello, world from P1";
+  static const int couleurs[] = {BLUE,   GREEN, CYAN,     RED,    PURPLE,
+                                 BROWN,  GRAY,  D_GRAY,   L_BLUE, L_GREEN,
+                                 L_CYAN, L_RED, L_PURPLE, YELLOW, WHITE};
+
+  const uint8_t taille = sizeof(couleurs) / sizeof(couleurs[0]);
+  const uint16_t row_proc1 = 1u;
+
+  if (color_index >= taille) {
+    return;
+  }
+
+  for (uint8_t ind = 0u; ind < 20u; ind++) {
+    uint16_t pos = (row_proc1 * VGA_WIDTH) + ind;
+    scr_tab[pos] =
+        (uint16_t)((BLINK | BACK | couleurs[color_index]) << 8) | message[ind];
   }
 }

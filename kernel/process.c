@@ -28,14 +28,16 @@ process_t process_table[NB_PROC];
 
 // Pointeurs et compteurs d'état du système
 process_t *current_active_process = NULL;
-pid_t next_pid_counter = 0;
+pid_t next_pid_counter = 1;
 
 /**
  * @brief Processus inactif (idle) tournant en fond.
  */
 static void idle() {
+  create_process("processus1", processus1, PRIORITY_MEDIUM);
+  create_process("minishell", minishell, PRIORITY_MEDIUM);
   while (1) {
-    printf("Idle (PID %u)\n", get_current_pid());
+    // printf("Idle (PID %u)\n", get_current_pid());
     hlt();
   }
 }
@@ -74,9 +76,7 @@ void init_processes() {
 
   // Création du processus idle
   create_process("idle", idle, PRIORITY_LOW);
-  create_process("processus1", processus1, PRIORITY_MEDIUM);
-  create_process("minishell", minishell, PRIORITY_MEDIUM);
-  // On démarre sur le processus idle
+  //  On démarre sur le processus idle
   current_active_process = &process_table[0];
   current_active_process->state = EXE;
   idle();
@@ -95,7 +95,12 @@ pid_t create_process(const char *name, void (*entry_point)(void),
 
   p->name = (char *)name;
   p->pid = next_pid_counter++;
-  p->ppid = get_current_pid(); // Le parent est celui qui appelle create_process
+  if (p->pid == 1) { // En cas de débordement du compteur de PID
+    p->ppid = 0;
+  } else {
+    p->ppid =
+        get_current_pid(); // Le parent est celui qui appelle create_process
+  }
   p->state = PRET;
   p->priority = priority;
   p->exit_code = 0;
@@ -124,7 +129,8 @@ void scheduler() {
   /* Recherche du prochain processus PRET (Round-Robin) */
   int cur_idx = index_of(old);
   int next_idx = (cur_idx + 1) % NB_PROC;
-
+  // On boucle jusqu'à trouver un processus prêt à s'exécuter (et la stack aussi
+  // car à cause de la struct)
   while (process_table[next_idx].state != PRET ||
          process_table[next_idx].stack == NULL) {
     next_idx = (next_idx + 1) % NB_PROC;
@@ -134,7 +140,7 @@ void scheduler() {
 
   next->state = EXE;
   current_active_process = next;
-
+  sti();
   ctx_sw(old->context, next->context);
 }
 
@@ -149,14 +155,25 @@ process_t *get_process_by_pid(pid_t pid) {
 
 void block_current_process() {
   current_active_process->state = BLO;
-  scheduler(0); // Force le changement de contexte immédiatement
+  scheduler(); // Force le changement de contexte immédiatement
 }
 
-void unblock_process(pid_t pid) {
+int block_process(pid_t pid) {
+  process_t *p = get_process_by_pid(pid);
+  if (p != NULL && p->state == PRET) {
+    p->state = BLO;
+    return 0;
+  }
+  return -1;
+}
+
+int unblock_process(pid_t pid) {
   process_t *p = get_process_by_pid(pid);
   if (p != NULL && p->state == BLO) {
     p->state = PRET;
+    return 0;
   }
+  return -1;
 }
 
 void exit_process(int status) {
@@ -171,10 +188,32 @@ void exit_process(int status) {
   }
 
   // On passe la main, ce processus ne s'exécutera plus jamais
-  scheduler(0);
+  scheduler();
 }
 
-void kill_current_process() { exit_process(-1); }
+int kill_current_process() { return kill_process(get_current_pid()); }
+
+int kill_process(pid_t pid) {
+  process_t *p = get_process_by_pid(pid);
+  if (p != NULL) {
+    p->state = ZOM;
+    p->exit_code = -1; // Code de sortie spécial pour "tué"
+    p->stack = NULL;   // Marque la case comme libre
+
+    // Réveiller le parent s'il était en train d'attendre (waitpid)
+    process_t *parent = get_process_by_pid(p->ppid);
+    if (parent != NULL && parent->state == BLO) {
+      unblock_process(parent->pid);
+    }
+
+    // Si on tue le processus courant, on doit scheduler immédiatement
+    if (p == current_active_process) {
+      scheduler();
+    }
+    return 0;
+  }
+  return -1; // Processus non trouvé
+}
 
 int waitpid(pid_t pid) {
   process_t *child = get_process_by_pid(pid);

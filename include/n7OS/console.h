@@ -102,4 +102,11 @@ void print_heure(heure_t heure);
  */
 void print_header();
 
+/**
+ * @brief Displays process1 special message with a specific color.
+ *
+ * @param color_index Index of the color to use in the palette.
+ */
+void print_process1_message(uint8_t color_index);
+
 #endif

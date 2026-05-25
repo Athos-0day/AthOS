@@ -95,16 +95,32 @@ process_t *get_process_by_pid(pid_t pid);
 void block_current_process();
 
 /**
+ * @brief Bloque un processus prêt à être exécuté.
+ *
+ * @param pid Le PID du processus à bloquer.
+ * @return -1 si le processus n'existe pas ou n'est pas prêt, 0 sinon.
+ */
+int block_process(pid_t pid);
+
+/**
  * @brief Débloque un processus bloqué.
  * @param pid Le PID du processus à débloquer.
+ * @return -1 si le processus n'existe pas ou n'est pas bloqué, 0 sinon.
  */
-void unblock_process(pid_t pid);
+int unblock_process(pid_t pid);
 
 /**
  * @brief Tue le processus en cours d'exécution.
- *
+ * @param pid Le PID du processus à tuer.
+ * @return -1 si le processus n'existe pas, 0 sinon.
  */
-void kill_current_process();
+int kill_process(pid_t pid);
+
+/**
+ * @brief Tue le processus en cours d'exécution.
+ * @return -1 si le processus n'existe pas, 0 sinon.
+ */
+int kill_current_process();
 
 /**
  * @brief Affiche la liste des processus et leurs états.

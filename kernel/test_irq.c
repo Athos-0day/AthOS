@@ -67,7 +67,7 @@ void handler_it32() {
   outb(inb(PICDATA) & 0xFE, PICDATA);
 
   // Ordonnancement
-  if (get_timer() % 10000u == 0u) {
+  if (get_timer() % 100u == 0u) {
     scheduler();
   }
 }
