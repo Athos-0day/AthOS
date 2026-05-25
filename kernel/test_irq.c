@@ -65,6 +65,11 @@ void handler_it32() {
 
   // Activation de l'IT
   outb(inb(PICDATA) & 0xFE, PICDATA);
+
+  // Ordonnancement
+  if (get_timer() % 10000u == 0u) {
+    scheduler();
+  }
 }
 
 /**

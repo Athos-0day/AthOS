@@ -3,13 +3,14 @@
 #include <n7OS/console.h>
 #include <n7OS/cpu.h>
 #include <n7OS/irq.h>
+#include <n7OS/keyboard.h>
 #include <n7OS/kheap.h>
 #include <n7OS/mem.h>
 #include <n7OS/paging.h>
+#include <n7OS/process.h>
 #include <n7OS/processor_structs.h>
 #include <n7OS/sys.h>
 #include <n7OS/time.h>
-#include <n7OS/keyboard.h>
 
 extern void init_irq();
 
@@ -39,11 +40,7 @@ void kernel_start(void) {
   */
 
   // test de l'interruption 50
-  __asm__ __volatile__("int $50" ::);
+  //__asm__ __volatile__("int $50" ::);
 
-  // on ne doit jamais sortir de kernel_start
-  while (1) {
-    // cette fonction arrete le processeur
-    hlt();
-  }
+  init_processes();
 }
