@@ -207,7 +207,7 @@ void print_heure(heure_t heure) {
 }
 
 void print_process1_message(uint8_t color_index) {
-  const char *message = "Hello, world from P1";
+  const char *message = "Allez le Stade Toulousain !";
   static const int couleurs[] = {BLUE,   GREEN, CYAN,     RED,    PURPLE,
                                  BROWN,  GRAY,  D_GRAY,   L_BLUE, L_GREEN,
                                  L_CYAN, L_RED, L_PURPLE, YELLOW, WHITE};
@@ -219,7 +219,7 @@ void print_process1_message(uint8_t color_index) {
     return;
   }
 
-  for (uint8_t ind = 0u; ind < 20u; ind++) {
+  for (uint8_t ind = 0u; ind < 27u; ind++) {
     uint16_t pos = (row_proc1 * VGA_WIDTH) + ind;
     scr_tab[pos] =
         (uint16_t)((BLINK | BACK | couleurs[color_index]) << 8) | message[ind];
