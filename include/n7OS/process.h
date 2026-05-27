@@ -15,7 +15,7 @@
 #include <inttypes.h>
 
 #define NB_PROC 15      // Nombre maximum de processus
-#define STACK_SIZE 1024 // Taille de la pile de chaque processus
+#define STACK_SIZE 1024 // Taille de la pile de chaque processus en mots 32 bits
 #define QUANTUM 50      // Quantum de temps pour l'ordonnancement
 
 typedef uint32_t pid_t; // Type pour les PID

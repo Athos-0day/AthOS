@@ -105,8 +105,8 @@ pid_t create_process(const char *name, void (*entry_point)(void),
   p->priority = priority;
   p->exit_code = 0;
 
-  // Allocation de la pile
-  p->stack = (uint32_t *)malloc(STACK_SIZE);
+  // Allocation de la pile (STACK_SIZE mots de 32 bits)
+  p->stack = (uint32_t *)malloc(STACK_SIZE * sizeof(uint32_t));
 
   p->stack[STACK_SIZE - 1] = (uint32_t)entry_point; // Adresse de retour fictive
 
