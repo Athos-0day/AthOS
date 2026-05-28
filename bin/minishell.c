@@ -100,9 +100,13 @@ void minishell() {
       }
     } else if (strncmp(command, "kill ", 5) == 0) {
       pid_t pid = atoi(command + 5);
-      int result = kill_process(pid);
-      if (result == -1) {
-        printf("Processus non trouvé : %d\n", pid);
+      if (pid <= 1) {
+        printf("PID 0 ou 1 interdit : %s\n", command + 5);
+      } else {
+        int result = kill_process(pid);
+        if (result == -1) {
+          printf("Processus non trouvé : %d\n", pid);
+        }
       }
     } else if (strcmp(command, "processus1") == 0) {
       create_process("processus1", processus1, PRIORITY_MEDIUM);
